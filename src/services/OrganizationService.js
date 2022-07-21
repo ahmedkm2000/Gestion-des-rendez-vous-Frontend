@@ -17,6 +17,9 @@ class OrganizationService{
     deleteOrganization(id){
         return axios.delete(ORGANIZATION_BASE_URL + id);
     }
+    addProfessionalToOrganization(idProAndOrg){
+        return axios.post(ORGANIZATION_BASE_URL+"add",idProAndOrg);
+    }
 
 }
 export default new OrganizationService()

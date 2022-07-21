@@ -24,6 +24,12 @@ export const SidebarData = [
         path: '/organizations',
         icon: <IoIcons.IoIosPaper />,
         cName: 'sub-nav'
+      },
+      {
+        title: "assign an admin",
+        path: '/organizations/assign',
+        icon: <IoIcons.IoIosPaper />,
+        cName: 'sub-nav'
       }
     ]
   },
