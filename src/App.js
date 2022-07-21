@@ -31,7 +31,10 @@ function App() {
               <Route  exact path="/sign-up" element={<SignUp />} />
           </Routes>
           </div>
+
     </Router>
+    
+    
 
     </div>
   );
