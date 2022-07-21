@@ -26,6 +26,9 @@ function App() {
             <Route exact path="/organizations/edit/:id"  element={<AddOrganization/>}/>
               <Route exact path="/admins/add"  element={<AddAdmin/>}/>
               <Route exact path="/admins/edit/:id"  element={<AddAdmin/>}/>
+              <Route exact path="/" element={<Login />} />
+              <Route exact path="/sign-in" element={<Login />} />
+              <Route  exact path="/sign-up" element={<SignUp />} />
           </Routes>
           </div>
     </Router>
