@@ -1,6 +1,8 @@
 import React,{useState,useEffect} from "react";
 import {useParams,useNavigate } from 'react-router-dom';
 import OrganizationService from '../services/OrganizationService.js';
+import Sidebar from "./Sidebar";
+import {SidebarData} from "./SidebarData";
 
 export default function AddOrganization(){
     const [formData,setFormData] = useState({});
@@ -51,6 +53,8 @@ export default function AddOrganization(){
     }
     return(
 <div >
+    <div>
+        <Sidebar data={SidebarData}/>
 <fieldset style= {Styles.fieldset}>
   <form onSubmit={saveOrganization}>
   <div class="form-outline mb-4">
@@ -83,6 +87,7 @@ export default function AddOrganization(){
   <button type="submit" class="btn btn-primary btn-block mb-4">Save</button>
 </form>
 </fieldset>
+</div>
 </div>
     )
 }

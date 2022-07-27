@@ -17,8 +17,11 @@ class OrganizationService{
     deleteOrganization(id){
         return axios.delete(ORGANIZATION_BASE_URL + id);
     }
-    addProfessionalToOrganization(idProAndOrg){
-        return axios.post(ORGANIZATION_BASE_URL+"add",idProAndOrg);
+    addAdminToOrganizations(id,idsOrg){
+        return axios.post(ORGANIZATION_BASE_URL+"add/"+id,idsOrg);
+    }
+    addUsersToOrganizations(id,idsOrg){
+        return axios.post(ORGANIZATION_BASE_URL+"add/users/"+id,idsOrg);
     }
 
 }

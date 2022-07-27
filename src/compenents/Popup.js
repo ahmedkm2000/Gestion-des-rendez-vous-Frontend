@@ -1,57 +1,39 @@
-import React,{useState,useEffect} from "react";
-import {useParams,useNavigate } from 'react-router-dom';
+import React,{useState , useEffect} from "react";
+import '../styles/popup.css';
+import {useNavigate, useParams} from "react-router-dom";
 import UserService from "../services/UserService";
-import Select from "react-select";
 import OrganizationService from "../services/OrganizationService";
-import RoleService from "../services/RoleService";
 import Sidebar from "./Sidebar";
 import {SidebarData} from "./SidebarData";
-
-export default function AddAdmin(){
+import Select from "react-select";
+import RoleService from "../services/RoleService";
+const Popup = props => {
     const [formData,setFormData] = useState({});
-    const [organizations, setOrganizations] = useState([]);
-    const [selectedOrganizations,setSelectedOrganizations] = useState();
+    const [organization, setOrganization] = useState([]);
+    const [roles, setRoles] = useState([]);
+    const [selectedRoles,setSelectedRoles] = useState();
     const [idAdmin,setIdAdmin] = useState();
     const { id } = useParams();
     const navigate = useNavigate();
     useEffect(() => {
-        if(id!==undefined){
-
-          UserService.getUserById(id).then((res)=>{
-              setFormData(res.data);
-              const org = []
-                  for( let i = 0 ; i < res.data.organizations.length ; i++){
-                      org.push({
-                          value: res.data.organizations[i].organization._id,
-                          label: res.data.organizations[i].organization.name
-                      })
-              }
-              setSelectedOrganizations(org);
-            })
-        }
-        RoleService.getRoleByName("admin").then((res)=>{
-            setIdAdmin(res.data._id)
-        })
-        OrganizationService.getAllOrganizations().then((res)=>{
+        var TempRoles= []
+        RoleService.getAllRoles().then((res)=>{
             for( let i = 0 ; i < res.data.length ; i++){
-                setOrganizations((prev) => [...prev, {
+                TempRoles.push({
                     value: res.data[i]._id,
                     label: res.data[i].name
-                }
-                ]);
+                })
             }
+            setRoles(TempRoles)
+        })
+        OrganizationService.getOrganizationById(id).then((res)=>{
+            setOrganization(res.data)
         })
     },[])
     const Styles = {
         fieldset:{
-            border:"1px solid grey",
-            width:"60%",
-            marginLeft:"30%",
-            marginTop:"4%",
-            marginBottom:"8%",
-            padding:"4%",
             textAlign:"center",
-            backgroundColor:"white"
+
         }
     }
     function onChange(event){
@@ -64,46 +46,39 @@ export default function AddAdmin(){
             }
         )
     }
-    function handleSelectOrganization(data) {
-        setSelectedOrganizations(data)
+    function handleSelectRoles(data) {
+        setSelectedRoles(data)
     }
     async function saveAdmin(event){
         event.preventDefault()
-        var organizationShema=[] ;
-        for (let i=0; i<selectedOrganizations.length;i++){
-           organizationShema.push({
-                organization:selectedOrganizations[i].value,
-                roles:[idAdmin]
-            })
+        var roleShema=[] ;
+        for (let i=0; i<selectedRoles.length;i++){
+            roleShema.push(selectedRoles[i].value)
         }
-        formData.organizations = organizationShema
-        if(formData._id===undefined){
-             UserService.createUser(formData).then(()=>{
-               UserService.getUserEmail(formData.email).then((res)=>{
-                   var ids=[]
-                   for (let i=0; i<formData.organizations.length;i++){
-                       ids.push(formData.organizations[i].organization)
-                   }
-                   console.log(ids)
-                   console.log("user : "+res.data._id)
-                   OrganizationService.addUsersToOrganizations(res.data._id,ids).then(()=>{
-                       console.log("success")
-                   })
-               })
+
+        formData.organizations = {
+            organization:organization._id,
+            roles:roleShema
+        }
+        UserService.createUser(formData).then(()=>{
+            UserService.getUserEmail(formData.email).then((res)=>{
+                var ids=[]
+                ids.push(id)
+                OrganizationService.addUsersToOrganizations(res.data._id,ids).then(()=>{
+                    console.log("success")
+                })
+            })
+                })
                 localStorage.setItem("notification","added");
                 navigate('/admins');
-            })
-        }else {
-            UserService.updateUser(formData._id,formData).then(()=>{
-                localStorage.setItem("notification","updated");
-                navigate('/admins')
 
-            });
-        }
     }
     return(
         <div >
             <Sidebar data={SidebarData}/>
+            <div className="popup-box">
+                <div className="box">
+                    <span className="close-icon" onClick={props.handleClose}>x</span>
             <fieldset style= {Styles.fieldset}>
                 <form onSubmit={saveAdmin}>
                     <div className="form-outline mb-4">
@@ -146,17 +121,27 @@ export default function AddAdmin(){
                                onChange={(e) => onChange(e)}
                         />
                     </div>
+                    <div className="form-outline mb-4">
+                        <input type="text"  className="form-control"
+                               name="organization"
+                               value={organization.name}
+                               readonly="readonly"
+                        />
+                    </div>
                     <Select
-                        options={organizations}
-                        placeholder="please select an organizations"
-                        value={selectedOrganizations}
-                        onChange={handleSelectOrganization}
+                        options={roles}
+                        placeholder="please select roles"
+                        value={selectedRoles}
+                        onChange={handleSelectRoles}
                         isSearchable={true}
                         isMulti
                     />
                     <button type="submit" className="btn btn-primary btn-block mb-4">Save</button>
                 </form>
             </fieldset>
-        </div>
-    )
+                </div>
+            </div>
+        </div>)
 }
+
+export default Popup;

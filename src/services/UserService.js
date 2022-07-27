@@ -14,6 +14,9 @@ class UserService{
     getUserById(id){
         return axios.get(USER_BASE_URL + id);
     }
+    getUserEmail(email){
+        return axios.get(USER_BASE_URL + "/email/"+email);
+    }
     createUser(user){
         return axios.post(USER_BASE_URL,user);
     }
@@ -22,6 +25,9 @@ class UserService{
     }
     deleteUser(id){
         return axios.delete(USER_BASE_URL + id);
+    }
+    addOrganizationToUser(id,body){
+        return axios.post(USER_BASE_URL+"organizations/add/"+id,body)
     }
 
 }

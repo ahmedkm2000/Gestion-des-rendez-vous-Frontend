@@ -53,5 +53,87 @@ export const SidebarData = [
         icon: <IoIcons.IoIosPaper />
       }
     ]
+  },
+  {
+    title: 'Logout',
+    path: '/logout',
+    icon: <RiIcons.RiAdminLine/>,
+    iconClosed: <RiIcons.RiArrowDownSFill />,
+    iconOpened: <RiIcons.RiArrowUpSFill />,
   }
 ];
+export function SidebarAdminData(id){
+ const SidebarAdminData = [
+  {
+    title: 'Admins',
+    path: '/organizations/all/'+id+'/admins',
+    icon: <RiIcons.RiAdminLine/>,
+
+    iconClosed: <RiIcons.RiArrowDownSFill />,
+    iconOpened: <RiIcons.RiArrowUpSFill />,
+
+    subNav: [
+      {
+        title: 'Add admin',
+        path: '/organizations/all/'+id+'/admins/add',
+        icon: <IoIcons.IoIosPaper />
+      },
+      {
+        title: "Admins's list",
+        path: '/organizations/all/'+id+'/admins',
+        icon: <IoIcons.IoIosPaper />
+      }
+    ]
+  },
+  {
+    title: 'Doctors',
+    path: '/organizations/all/'+id+'/doctors',
+    icon: <RiIcons.RiAdminLine/>,
+
+    iconClosed: <RiIcons.RiArrowDownSFill />,
+    iconOpened: <RiIcons.RiArrowUpSFill />,
+
+    subNav: [
+      {
+        title: 'Add Doctor',
+        path: '/organizations/all/'+id+'/doctors/add',
+        icon: <IoIcons.IoIosPaper />
+      },
+      {
+        title: "Doctor's list",
+        path: '/organizations/all/'+id+'/doctors',
+        icon: <IoIcons.IoIosPaper />
+      }
+    ]
+  },
+  {
+    title: 'Entry Clerks',
+    path: '/organizations/all/'+id+'/entry-clerks',
+    icon: <RiIcons.RiAdminLine/>,
+
+    iconClosed: <RiIcons.RiArrowDownSFill />,
+    iconOpened: <RiIcons.RiArrowUpSFill />,
+
+    subNav: [
+      {
+        title: 'Add Entry Clerk',
+        path: '/organizations/all/'+id+'/entry-clerks/add',
+        icon: <IoIcons.IoIosPaper />
+      },
+      {
+        title: "entry-clerk's list",
+        path: '/organizations/all/'+id+'/entry-clerks',
+        icon: <IoIcons.IoIosPaper />
+      }
+    ]
+  },
+  {
+    title: 'Logout',
+    path: '/logout',
+    icon: <RiIcons.RiAdminLine/>,
+    iconClosed: <RiIcons.RiArrowDownSFill />,
+    iconOpened: <RiIcons.RiArrowUpSFill />,
+  }
+]
+return SidebarAdminData;
+};

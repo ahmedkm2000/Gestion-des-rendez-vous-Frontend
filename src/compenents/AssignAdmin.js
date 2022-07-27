@@ -1,13 +1,18 @@
 import React,{useState,useEffect} from 'react';
+import {useNavigate, useParams} from "react-router-dom";
 import Select from "react-select";
 import UserService from "../services/UserService";
 import OrganizationService from "../services/OrganizationService";
+import Sidebar from "./Sidebar";
+import {SidebarData} from "./SidebarData";
+
 export default function AssignAdmin(){
-    const [admins, setAdmins] = useState([]);
+    const [admins, setAdmins] = useState([])
     const [organizations, setOrganizations] = useState([]);
     const [selectedAdmin,setSelectedAdmin] = useState();
     const [selectedOrganizations,setSelectedOrganizations] = useState();
-    var exist = true
+    const navigate  = useNavigate();
+    const { id } = useParams();
     useEffect(()=>{
         UserService.getAllUsers().then((res)=>{
             for( let i = 0 ; i < res.data.length ; i++){
@@ -31,6 +36,7 @@ export default function AssignAdmin(){
     },[])
 
     function handleSelectAdmin(data) {
+        navigate('/organizations/assign/'+data.value);
         setOrganizations([])
         OrganizationService.getAllOrganizations().then((res)=>{
             for( let i = 0 ; i < res.data.length ; i++){
@@ -42,20 +48,34 @@ export default function AssignAdmin(){
             }
         })
         UserService.getUserById(data.value).then((res)=>{
+
+            var idOrgs =[]
             for(let i = 0 ; i <res.data.organizations.length;i++){
                 console.log(res.data.organizations[i])
                for(let j = 0 ; j <res.data.organizations[i].roles.length;j++){
                    if(res.data.organizations[i].roles[j].name==="admin"){
-                        var idOrg = res.data.organizations[i].organization._id
+                         idOrgs.push(res.data.organizations[i].organization._id)
                    }
                }
-                setOrganizations((organizations) => organizations.filter( organization => organization.value!==idOrg));
+                for(let k = 0 ; k <res.data.organizations.length;k++){
+                    setOrganizations((organizations) => organizations.filter( organization => organization.value!==idOrgs[k]));
+
+                }
+
             }
         })
         setSelectedAdmin(data)
     }
     function handleSelectOrganization(data) {
        setSelectedOrganizations(data)
+    }
+    function addProfessionalToOrganizations(event){
+        event.preventDefault();
+        event.persist()
+        OrganizationService.addAdminToOrganizations(id,selectedOrganizations).then((res)=>{
+            localStorage.setItem("notification","added");
+            navigate('/admins')
+        })
     }
     const Styles = {
         fieldset:{
@@ -75,8 +95,10 @@ export default function AssignAdmin(){
         }
     }
     return (
+        <div>
+            <Sidebar data={SidebarData}/>
         <fieldset style= {Styles.fieldset}>
-        <form>
+        <form onSubmit={addProfessionalToOrganizations}>
             <h4>list of admins</h4>
             <div style={Styles.spaces} className="dropdown-container">
                 <Select
@@ -92,6 +114,7 @@ export default function AssignAdmin(){
                     options={organizations}
                     placeholder="please select an organizations"
                     value={selectedOrganizations}
+                    name=""
                     onChange={handleSelectOrganization}
                     isSearchable={true}
                     isMulti
@@ -100,5 +123,6 @@ export default function AssignAdmin(){
             </div>
         </form>
         </fieldset>
+        </div>
     );
 }
