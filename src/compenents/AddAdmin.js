@@ -11,12 +11,13 @@ export default function AddAdmin(){
     const [formData,setFormData] = useState({});
     const [organizations, setOrganizations] = useState([]);
     const [selectedOrganizations,setSelectedOrganizations] = useState();
+    const [roles, setRoles] = useState([]);
+    const [selectedRoles,setSelectedRoles] = useState();
     const [idAdmin,setIdAdmin] = useState();
     const { id } = useParams();
     const navigate = useNavigate();
     useEffect(() => {
         if(id!==undefined){
-
           UserService.getUserById(id).then((res)=>{
               setFormData(res.data);
               const org = []
@@ -29,6 +30,15 @@ export default function AddAdmin(){
               setSelectedOrganizations(org);
             })
         }
+        RoleService.getAllRoles().then((res)=>{
+            for( let i = 0 ; i < res.data.length ; i++){
+                setRoles((prev) => [...prev, {
+                    value: res.data[i]._id,
+                    label: res.data[i].name
+                }
+                ]);
+            }
+        });
         RoleService.getRoleByName("admin").then((res)=>{
             setIdAdmin(res.data._id)
         })
@@ -67,13 +77,22 @@ export default function AddAdmin(){
     function handleSelectOrganization(data) {
         setSelectedOrganizations(data)
     }
+    function handleSelectRoles(data) {
+        setSelectedRoles(data)
+    }
     async function saveAdmin(event){
         event.preventDefault()
         var organizationShema=[] ;
+        var TempRoles=[] ;
+
+        for (let i=0; i<selectedRoles.length;i++){
+            TempRoles.push(selectedRoles[i].value)
+        }
+        console.log(TempRoles)
         for (let i=0; i<selectedOrganizations.length;i++){
            organizationShema.push({
                 organization:selectedOrganizations[i].value,
-                roles:[idAdmin]
+                roles:TempRoles
             })
         }
         formData.organizations = organizationShema
@@ -84,8 +103,6 @@ export default function AddAdmin(){
                    for (let i=0; i<formData.organizations.length;i++){
                        ids.push(formData.organizations[i].organization)
                    }
-                   console.log(ids)
-                   console.log("user : "+res.data._id)
                    OrganizationService.addUsersToOrganizations(res.data._id,ids).then(()=>{
                        console.log("success")
                    })
@@ -146,14 +163,26 @@ export default function AddAdmin(){
                                onChange={(e) => onChange(e)}
                         />
                     </div>
+                    <div className="form-outline mb-4">
                     <Select
                         options={organizations}
-                        placeholder="please select an organizations"
+                        placeholder="please select  organizations"
                         value={selectedOrganizations}
                         onChange={handleSelectOrganization}
                         isSearchable={true}
                         isMulti
                     />
+                    </div>
+                    <div className="form-outline mb-4">
+                    <Select
+                        options={roles}
+                        placeholder="please select roles"
+                        value={selectedRoles}
+                        onChange={handleSelectRoles}
+                        isSearchable={true}
+                        isMulti
+                    />
+                    </div>
                     <button type="submit" className="btn btn-primary btn-block mb-4">Save</button>
                 </form>
             </fieldset>

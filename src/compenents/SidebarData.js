@@ -34,7 +34,7 @@ export const SidebarData = [
     ]
   },
   {
-    title: 'Admins',
+    title: 'Users',
     path: '/admins',
     icon: <RiIcons.RiAdminLine/>,
 
@@ -43,13 +43,34 @@ export const SidebarData = [
 
     subNav: [
       {
-        title: 'Add admin',
+        title: 'Add user',
         path: '/admins/add',
         icon: <IoIcons.IoIosPaper />
       },
       {
-        title: "Admins's list",
+        title: "Users's list",
         path: '/admins',
+        icon: <IoIcons.IoIosPaper />
+      }
+    ]
+  },
+  {
+    title: 'Unavailability',
+    path: '/unavailability',
+    icon: <RiIcons.RiAdminLine/>,
+
+    iconClosed: <RiIcons.RiArrowDownSFill />,
+    iconOpened: <RiIcons.RiArrowUpSFill />,
+
+    subNav: [
+      {
+        title: 'Add Unavailability',
+        path: '/unavailability/add',
+        icon: <IoIcons.IoIosPaper />
+      },
+      {
+        title: "unavailability's list",
+        path: '/unavailability',
         icon: <IoIcons.IoIosPaper />
       }
     ]

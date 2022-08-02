@@ -1,5 +1,13 @@
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import "jquery/dist/jquery.min.js";
+import "datatables.net-dt/js/dataTables.dataTables";
+import "datatables.net-dt/css/jquery.dataTables.min.css";
+import "datatables.net-buttons/js/dataTables.buttons.js";
+import "datatables.net-buttons/js/buttons.colVis.js";
+import "datatables.net-buttons/js/buttons.flash.js";
+import "datatables.net-buttons/js/buttons.html5.js";
+import "datatables.net-buttons/js/buttons.print.js";
 import {BrowserRouter as Router,Routes,Route}from "react-router-dom";
 import Organization from './compenents/Organization';
 import Admins from "./compenents/Admins";
@@ -10,11 +18,12 @@ import Login from "./compenents/Login";
 import Logout from "./compenents/Logout";
 import AdminPage from "./compenents/AdminPage";
 import SignUp from "./compenents/Signup";
-import {SidebarAdminData} from "./compenents/SidebarData";
 import {AuthProvider} from "./compenents/Auth";
 import {RequireAuth} from "./compenents/RequireAuth";
 import OrganizationList from "./compenents/OrganizationList";
 import Roles from "./compenents/Roles";
+import Unavailability from "./compenents/Unavailability";
+import PopupUnavailability from "./compenents/PopupUnavailability";
 function App() {
   return (
       <AuthProvider>
@@ -27,6 +36,8 @@ function App() {
               <Route exact path="/login"  element={<Login/>}/>
               <Route exact path="/logout"  element={<Logout/>}/>
               <Route exact path="/organizations"  element={<RequireAuth><Organization/></RequireAuth>}/>
+              <Route exact path="/unavailability"  element={<RequireAuth><Unavailability/></RequireAuth>}/>
+              <Route exact path="/unavailability/add"  element={<RequireAuth><PopupUnavailability/></RequireAuth>}/>
               <Route exact path="/organizations/all"  element={<RequireAuth><OrganizationList/></RequireAuth>}/>
               <Route exact path="/organizations/all/:id"  element={<RequireAuth><AdminPage/></RequireAuth>}/>
               <Route exact path="/organizations/:id/users"  element={<RequireAuth><Admins/></RequireAuth>}/>

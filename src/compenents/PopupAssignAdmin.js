@@ -1,50 +1,54 @@
 import React,{useState , useEffect} from "react";
-import '../styles/popup.css';
 import {useNavigate, useParams} from "react-router-dom";
-import UserService from "../services/UserService";
-import OrganizationService from "../services/OrganizationService";
+import '../styles/popup.css';
 import Sidebar from "./Sidebar";
 import {SidebarData} from "./SidebarData";
 import Select from "react-select";
+import UserService from "../services/UserService";
+import OrganizationService from "../services/OrganizationService";
 import RoleService from "../services/RoleService";
+import {toast} from "react-toastify";
+
 const PopupAssignAdmin = props => {
-    const [formData,setFormData] = useState({});
     const [organization, setOrganization] = useState([]);
     const [roles, setRoles] = useState([]);
-    const [selectedRoles,setSelectedRoles] = useState();
-    const [users, setUsers] = useState([]);
-    const [selectedUser,setSelectedUser] = useState();
+    const [user, setUser] = useState([]);
+    const [selectedRoles,setSelectedRoles] = useState([]);
+    var [idUser,setIdUser] = useState() ;
+    const [isHidden, setIsHidden] = useState(true);
     var TempIdRoles =[];
-    var TempRoles= []   
+    var TempRoles= []
     const { id } = useParams();
     const navigate = useNavigate();
+    const Styles = {
+        fieldset:{
+            textAlign:"center",
+        }
+    }
     useEffect(() => {
         OrganizationService.getOrganizationById(id).then((res)=>{
             setOrganization(res.data)
         })
-        UserService.getAllUsers().then((res)=>{
-            var TempUsers =[]
-            for( let i = 0 ; i < res.data.length ; i++){
-                TempUsers.push({
-                    value: res.data[i]._id,
-                    label: res.data[i].email
-                })
-            }
-            setUsers(TempUsers)
-        })
     },[])
-    const Styles = {
-        fieldset:{
-            textAlign:"center",
-
-        }
-    }
     function handleSelectRoles(data) {
         setSelectedRoles(data)
     }
-    async function handleSelectProfessional(data){
-
-         await RoleService.getAllRoles().then((res)=>{
+    async function handleSelectProfessional(event){
+        setIsHidden(true)
+        const email = event.target.value;
+        setUser(email);
+    }
+    async function validateEmail(){
+       await UserService.getUserEmail(user).then((res)=>{
+            idUser = res.data._id ;
+            setIdUser(idUser)
+            if(idUser!=undefined){
+                setIsHidden(false);
+            }else{
+                setIsHidden(true);
+            }
+        })
+        await RoleService.getAllRoles().then((res)=>{
             for( let i = 0 ; i < res.data.length ; i++){
                 TempRoles.push({
                     value: res.data[i]._id,
@@ -52,50 +56,50 @@ const PopupAssignAdmin = props => {
                 })
             }
         })
-        console.log(TempRoles)
+        setRoles(TempRoles)
         await OrganizationService.getOrganizationById(id).then((res)=>{
             for(let i = 0 ; i <res.data.users.length;i++){
-               if(res.data.users[i]._id === data.value){ 
-                   UserService.getUserById(data.value).then((res)=>{
-                       for(let k = 0 ; k <res.data.organizations.length;k++){
-                           if(res.data.organizations[k].organization._id === id){
-                               for(let n = 0 ; n <res.data.organizations[k].roles.length;n++){
-                                   TempIdRoles.push(res.data.organizations[k].roles[n]._id)
-
-                               }
-                                 for(let m = 0 ; m <TempIdRoles.length;m++){
-                                     setRoles((roles) => roles.filter( role => role.value!==TempIdRoles[m]));
-
-                                 }
-                           }
-                       }
-                   })
-               }  else{
-                         setRoles(TempRoles)
-               }
+                if(res.data.users[i]._id === idUser){
+                    UserService.getUserById(idUser).then((res)=>{
+                        for(let k = 0 ; k <res.data.organizations.length;k++){
+                            if(res.data.organizations[k].organization._id === id){
+                                for(let n = 0 ; n <res.data.organizations[k].roles.length;n++){
+                                    TempIdRoles.push(res.data.organizations[k].roles[n]._id)
+                                }
+                                for(let m = 0 ; m <TempIdRoles.length;m++){
+                                    setRoles((roles) => roles.filter( role => role.value!==TempIdRoles[m]));
+                                }
+                            }
+                        }
+                    })
+                }  else{
+                    setRoles(TempRoles)
                 }
+            }
 
-            })
-            setSelectedUser(data)        
-        }
+        })
+    }
 
     async function saveAdmin(event){
         var RolesShema =[]
         var OrganizationShema = []
         var exist = false;
         event.preventDefault()
+        if(selectedRoles.length<1){
+            toast.error('please choose at least one role!', {position: toast.POSITION.TOP_RIGHT, autoClose:3000})
+        }else{
         for (let i=0; i<selectedRoles.length;i++){
             RolesShema.push(selectedRoles[i].value)
         }
         await OrganizationService.getOrganizationById(id).then((res)=>{
             for (let i=0; i<res.data.users.length;i++){
-                if (res.data.users[i]._id === selectedUser.value){
+                if (res.data.users[i]._id === idUser){
                     exist = true;
                     for (let j=0; j<res.data.users[i].organizations.length;j++){
                         if(res.data.users[i].organizations[j].organization === id){
-                           var TempRoles = res.data.users[i].organizations[j].roles;
+                            var TempRoles = res.data.users[i].organizations[j].roles;
                             for (let k=0; k<selectedRoles.length;k++){
-                            TempRoles.push(selectedRoles[k].value)
+                                TempRoles.push(selectedRoles[k].value)
                             }
                             OrganizationShema.push({
                                 organization:res.data.users[i].organizations[j].organization,
@@ -108,10 +112,10 @@ const PopupAssignAdmin = props => {
                             })
                         }
                     }
-                    UserService.getUserById(selectedUser.value).then((res)=>{
+                    UserService.getUserById(idUser).then((res)=>{
                         var userData = res.data;
                         userData.organizations = OrganizationShema;
-                        UserService.updateUser(selectedUser.value,userData).then((res)=>{
+                        UserService.updateUser(idUser,userData).then((res)=>{
                             console.log("success")
                         })
                     })
@@ -123,41 +127,34 @@ const PopupAssignAdmin = props => {
             OrganizationService.getOrganizationById(id).then((res)=>{
                 var organizationData = res.data
                 var users = res.data.users;
-                users.push(selectedUser.value);
+                users.push(idUser);
                 organizationData.users = users;
                 OrganizationService.updateOrganization(id,organizationData).then((res)=>{
                     console.log("added to org")
                 })
             })
-            UserService.getUserById(selectedUser.value).then((res)=>{
+            UserService.getUserById(idUser).then((res)=>{
                 var TempRoles = []
                 var userData = res.data;
                 var organizations = res.data.organizations;
-                console.log('org')
-                console.log(organizations)
                 for (let k=0; k<selectedRoles.length;k++){
                     TempRoles.push(selectedRoles[k].value)
                 }
-                console.log('ffffffffffffff')
-                console.log(id)
-                console.log(TempRoles)
                 organizations.push({
                     organization:id,
                     roles:TempRoles
                 })
-                console.log('push')
-                console.log(organizations)
                 userData.organizations = organizations;
-                UserService.updateUser(selectedUser.value,userData).then((res)=>{
+                UserService.updateUser(idUser,userData).then((res)=>{
                     console.log("user updated .... success")
                 })
             })
 
         }
-        console.log(exist)
+    }
+        props.handleClose();
+        toast.success('User has been added successufely!', {position: toast.POSITION.TOP_RIGHT, autoClose:3000})
 
-        localStorage.setItem("notification","added");
-        navigate('/admins');
 
     }
     return(
@@ -167,37 +164,37 @@ const PopupAssignAdmin = props => {
                 <div className="box">
                     <span className="close-icon" onClick={props.handleClose}>x</span>
                     <fieldset style= {Styles.fieldset}>
-                        <form onSubmit={saveAdmin}>
-
-                            <div className="form-outline mb-4">
-
-                            <div className="form-outline mb-4">
-                                <Select
-                                    options={users}
-                                    placeholder="please select user"
-                                    value={selectedUser}
-                                    onChange={handleSelectProfessional}
-                                    isSearchable={true}
-                                />
-                            </div>
-                            <div className="form-outline mb-4">
-                                <input type="text"  className="form-control"
-                                       name="organization"
-                                       value={organization.name}
-                                       readonly="readonly"
-                                />
-                            </div>
-                            <Select
-                                options={roles}
-                                placeholder="please select roles"
-                                value={selectedRoles}
-                                onChange={handleSelectRoles}
-                                isSearchable={true}
-                                isMulti
+                        <div className="form-outline mb-4">
+                            <input type="text" className="form-control"
+                                   placeholder="please enter a user"
+                                   name="user"
+                                   value={user}
+                                   onChange={(e) => handleSelectProfessional(e)}
                             />
+                            <button className="btn btn-primary btn-block mb-4" onClick={validateEmail}>Validate</button>
+                        </div>
+                        {isHidden === false?
+                        <form onSubmit={saveAdmin}>
+                            <div className="form-outline mb-4">
+                                <div className="form-outline mb-4">
+                                    <input type="text"  className="form-control"
+                                           name="organization"
+                                           value={organization.name}
+                                           readonly="readonly"
+                                    />
+                                </div>
+                                <Select
+                                    options={roles}
+                                    placeholder="please select roles"
+                                    value={selectedRoles}
+                                    onChange={handleSelectRoles}
+                                    isSearchable={true}
+                                    isMulti
+                                />
                                 <button type="submit" className="btn btn-primary btn-block mb-4">Save</button>
                             </div>
                         </form>
+                            :""}
                     </fieldset>
                 </div>
             </div>

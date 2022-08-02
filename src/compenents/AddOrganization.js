@@ -1,31 +1,32 @@
 import React,{useState,useEffect} from "react";
 import {useParams,useNavigate } from 'react-router-dom';
-import OrganizationService from '../services/OrganizationService.js';
 import Sidebar from "./Sidebar";
 import {SidebarData} from "./SidebarData";
+import OrganizationService from '../services/OrganizationService.js';
 
 export default function AddOrganization(){
     const [formData,setFormData] = useState({});
     const { id } = useParams();
     const navigate = useNavigate();
+    const Styles = {
+        fieldset:{
+            border:"1px solid grey",
+            width:"60%",
+            marginLeft:"30%",
+            marginTop:"4%",
+            marginBottom:"8%",
+            padding:"4%",
+            textAlign:"center",
+            backgroundColor:"white"
+        }}
+
     useEffect(() => {
         if(id!=undefined)
             OrganizationService.getOrganizationById(id).then((res)=>{
                  setFormData(res.data);
-            })
+            });
         },[])
-    const Styles = {
-       fieldset:{
-        border:"1px solid grey",
-        width:"60%",
-        marginLeft:"30%",
-        marginTop:"4%",
-        marginBottom:"8%",
-        padding:"4%",
-        textAlign:"center",
-        backgroundColor:"white"
-       }
-        }
+
     function onChange(event){
         event.preventDefault();
         event.persist();
@@ -36,23 +37,24 @@ export default function AddOrganization(){
                 }
             )
         }
+
     function saveOrganization(event){
-        event.preventDefault()
+        event.preventDefault();
+        event.persist();
         if(formData._id===undefined){
         OrganizationService.createOrganization(formData).then((res)=>{
             localStorage.setItem("notification","added");
             navigate('/organizations');
-        })
+        });
        }else {
         OrganizationService.updateOrganization(formData._id,formData).then((res)=>{
             localStorage.setItem("notification","updated");
             navigate('/organizations')
- 
         });
         }
     }
     return(
-<div >
+        <div >
     <div>
         <Sidebar data={SidebarData}/>
 <fieldset style= {Styles.fieldset}>

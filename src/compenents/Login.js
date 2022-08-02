@@ -1,53 +1,13 @@
-
 import React, {useState,useEffect} from 'react';
 import {useNavigate} from "react-router-dom";
-import UserService from "../services/UserService";
 import {useAuth} from "./Auth";
 import {Alert} from "@mui/material";
+import UserService from "../services/UserService";
 export default function Login () {
-    const [formData, setFormData] = useState({
-        email: "",
-        password: ""
-    });
-    const [alert, setAlert] = useState(false)
+    const [formData, setFormData] = useState({email: "", password: ""});
+    const [alert, setAlert] = useState(false);
     const auth = useAuth();
     const navigate = useNavigate();
-    useEffect(() => {
-        if (auth.user) {
-            navigate('/organizations')
-        }
-    })
-
-    function onChange(event) {
-        setFormData(prevState => {
-                return {
-                    ...prevState,
-                    [event.target.name]: event.target.value
-                }
-            }
-        )
-    }
-
-    function login(event) {
-        event.preventDefault();
-        event.persist();
-        UserService.login(formData).then((res) => {
-            auth.login(res.data);
-            localStorage.setItem('userInfo', JSON.stringify(res.data.data));
-            if (res.data.data.isSuperAdmin === true) {
-                auth.setSuperAdmin(true);
-                localStorage.setItem('isSuperAdmin', "true");
-                navigate('/organizations', {replace: true})
-            } else {
-                auth.setSuperAdmin(false);
-                localStorage.setItem('isSuperAdmin', "false");
-                navigate('/organizations/all', {replace: true})
-            }
-        }).catch((error) => {
-            setAlert(true);
-        })
-    }
-
     const Styles = {
         h3: {
             fontWeight: "500px",
@@ -94,6 +54,41 @@ export default function Login () {
             width: "300px",
             fontFamily: "Arial"
         },
+    }
+    useEffect(() => {
+        if (auth.user) {
+            navigate('/organizations')
+        }
+    })
+
+    function onChange(event) {
+        setFormData(prevState => {
+                return {
+                    ...prevState,
+                    [event.target.name]: event.target.value
+                }
+            }
+        )
+    }
+
+    function login(event) {
+        event.preventDefault();
+        event.persist();
+        UserService.login(formData).then((res) => {
+            auth.login(res.data);
+            localStorage.setItem('userInfo', JSON.stringify(res.data.data));
+            if (res.data.data.isSuperAdmin === true) {
+                auth.setSuperAdmin(true);
+                localStorage.setItem('isSuperAdmin', "true");
+                navigate('/organizations', {replace: true})
+            } else {
+                auth.setSuperAdmin(false);
+                localStorage.setItem('isSuperAdmin', "false");
+                navigate('/organizations/all', {replace: true})
+            }
+        }).catch((error) => {
+            setAlert(true);
+        })
     }
 
     return (

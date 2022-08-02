@@ -1,7 +1,6 @@
 import React,{useState,useEffect} from 'react';
 import {useParams} from "react-router-dom";
 import {useAuth} from "./Auth";
-import {useLayoutEffect} from "react";
 import Sidebar from "./Sidebar";
 import {SidebarAdminData} from "./SidebarData";
 

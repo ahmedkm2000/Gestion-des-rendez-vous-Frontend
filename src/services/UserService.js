@@ -15,7 +15,7 @@ class UserService{
         return axios.get(USER_BASE_URL + id);
     }
     getUserEmail(email){
-        return axios.get(USER_BASE_URL + "/email/"+email);
+        return axios.get(USER_BASE_URL + "email/"+email);
     }
     createUser(user){
         return axios.post(USER_BASE_URL,user);
