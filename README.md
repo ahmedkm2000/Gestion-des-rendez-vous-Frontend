@@ -1,6 +1,7 @@
-# Getting Started with Create React App
+# management of professionals within medical organizations
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Note: this is a repository of professional Management System Frontend. the repository of the backend is available here: https://github.com/ahmedkm2000/Gestion-des-rendez-vous/
+
 
 ## Available Scripts
 
